@@ -2,11 +2,10 @@
 
 cwlVersion: v1.0
 class: Workflow
-label: <YOUR CHALLENGE> Evaluation
+label: shiny-icarus Evaluation
 doc: >
-  BRIEF DESCRIPTION ABOUT THE CHALLENGE, e.g.
   This workflow will run and evaluate Docker submissions to the
-  Awesome Challenge (syn123). Metrics returned are x, y, z.
+  shiny-icarus Challenge (syn123). Metrics returned are x, y, z.
 
 requirements:
   - class: StepInputExpressionRequirement
@@ -37,9 +36,8 @@ steps:
     in:
       - id: entityid
         source: "#submitterUploadSynId"
-      # TODO: replace `valueFrom` with the admin user ID or admin team ID
       - id: principalid
-        valueFrom: "3379097"
+        valueFrom: "3461408"
       - id: permissions
         valueFrom: "download"
       - id: synapse_config
@@ -51,9 +49,8 @@ steps:
     in:
       - id: entityid
         source: "#adminUploadSynId"
-      # TODO: replace `valueFrom` with the admin user ID or admin team ID
       - id: principalid
-        valueFrom: "3379097"
+        valueFrom: "3461408"
       - id: permissions
         valueFrom: "download"
       - id: synapse_config
@@ -171,9 +168,8 @@ steps:
       # OPTIONAL: set `default` to `false` if log file should not be uploaded to Synapse
       - id: store
         default: true
-      # TODO: replace `valueFrom` with the absolute path to the data directory to be mounted
       - id: input_dir
-        valueFrom: "/tmp"
+        valueFrom: "/input"
       - id: docker_script
         default:
           class: File
