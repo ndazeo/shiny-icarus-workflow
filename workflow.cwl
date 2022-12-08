@@ -271,10 +271,11 @@ steps:
   score:
     run: steps/score.cwl
     in:
-      - id: input_file
+      - id: input
         source: "#run_docker/predictions"
       - id: goldstandard
-        source: "#download_goldstandard/filepath"
+        # source: "#download_goldstandard/filepath"
+        valueFrom: "/home/ndazeo/Documents/projects/shiny-icarus/goldstandard"
       - id: check_validation_finished 
         source: "#check_status/finished"
     out:

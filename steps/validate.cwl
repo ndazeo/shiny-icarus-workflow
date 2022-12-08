@@ -20,17 +20,19 @@ requirements:
 
         args = parser.parse_args()
 
-        if args.submission_file is None:
-            prediction_file_status = "INVALID"
-            invalid_reasons = ['Expected FileEntity type but found ' + args.entity_type]
-        else:
-            with open(args.submission_file,"r") as sub_file:
-                message = sub_file.read()
-            invalid_reasons = []
-            prediction_file_status = "VALIDATED"
-            if not message.startswith("test"):
-                invalid_reasons.append("Submission must have test column")
-                prediction_file_status = "INVALID"
+        #if args.submission_file is None:
+        #    prediction_file_status = "INVALID"
+        #    invalid_reasons = ['Expected FileEntity type but found ' + args.entity_type]
+        #else:
+        #    with open(args.submission_file,"r") as sub_file:
+        #        message = sub_file.read()
+        #    invalid_reasons = []
+        #    prediction_file_status = "VALIDATED"
+        #    if not message.startswith("test"):
+        #        invalid_reasons.append("Submission must have test column")
+        #        prediction_file_status = "INVALID"
+        invalid_reasons = []
+        prediction_file_status = "VALIDATED"
         result = {'submission_errors': "\n".join(invalid_reasons),
                   'submission_status': prediction_file_status}
         with open(args.results, 'w') as o:
