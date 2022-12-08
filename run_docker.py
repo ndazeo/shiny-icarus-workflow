@@ -201,11 +201,11 @@ def main(syn, args):
 
     output_folder = os.listdir(output_dir)
     if not output_folder:
-        raise Exception("No 'predictions.csv' file written to /output, "
+        raise Exception("No file written to /output, "
                         "please check inference docker")
-    elif "predictions.csv" not in output_folder:
-        raise Exception("No 'predictions.csv' file written to /output, "
-                        "please check inference docker")
+    #elif "predictions.csv" not in output_folder:
+    #    raise Exception("No 'predictions.csv' file written to /output, "
+    #                    "please check inference docker")
     # CWL has a limit of the array of files it can accept in a folder
     # therefore creating a tarball is sometimes necessary
     # tar(output_dir, 'outputs.tar.gz')
