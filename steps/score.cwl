@@ -19,6 +19,7 @@ requirements:
 
 
         import numpy as np
+        import tarfile
         import os
         import collections
         import inspect
