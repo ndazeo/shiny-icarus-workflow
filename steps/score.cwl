@@ -38,9 +38,9 @@ baseCommand: python
 arguments:
   - valueFrom: score.py
   - prefix: -ref
-    valueFrom: $(inputs.input.path)
-  - prefix: -pred
     valueFrom: $(inputs.goldstandard.path)
+  - prefix: -pred
+    valueFrom: $(inputs.input.path)
   - prefix: -r
     valueFrom: results.json
 

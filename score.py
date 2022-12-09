@@ -1001,11 +1001,13 @@ def main():
     
     args = parser.parse_args()
 
-    untar('output', args.pred)
     untar('ref', args.ref)
-    print("output", os.listdir('output'))
     print("ref", os.listdir('ref'))
-    result = evaluate_folder('ref', 'output', args.l)
+    
+    untar('pred', args.pred)
+    print("pred", os.listdir('pred'))
+    
+    result = evaluate_folder('ref', 'pred', args.l)
     with open(args.results, 'w') as o:
         o.write(json.dumps(result))
 
