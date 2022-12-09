@@ -277,6 +277,10 @@ steps:
         source: "#download_goldstandard/filepath"
       - id: check_validation_finished 
         source: "#check_status/finished"
+      - id: script
+        default:
+          class: File
+          location: "score.py"
     out:
       - id: results
       
