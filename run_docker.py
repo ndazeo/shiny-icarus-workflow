@@ -85,7 +85,7 @@ def tar(directory, tar_filename):
         tar_filename:  tar file path
     """
     with tarfile.open(tar_filename, "w") as tar_o:
-        tar_o.add(directory)
+        tar_o.add(directory, arcname='.')
     # TODO: Potentially add code to remove all files that were zipped.
 
 
@@ -124,8 +124,8 @@ def main(syn, args):
     docker_image = args.docker_repository + "@" + args.docker_digest
 
     # These are the volumes that you want to mount onto your docker container
-    #output_dir = os.path.join(os.getcwd(), "output")
-    output_dir = os.getcwd()
+    output_dir = os.path.join(os.getcwd(), "output")
+    #output_dir = os.getcwd()
     input_dir = args.input_dir
 
     print("mounting volumes")
