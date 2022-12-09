@@ -1010,10 +1010,10 @@ requirements:
         
             parser.add_argument("-r", "--results", required=True, help="Scoring results")
             
+            args = parser.parse_args()
+
             untar('output', args.pred)
             untar('ref', args.ref)
-            
-            args = parser.parse_args()
             result = evaluate_folder('output', 'ref', args.l)
             with open(args.results, 'w') as o:
               o.write(json.dumps(result))
