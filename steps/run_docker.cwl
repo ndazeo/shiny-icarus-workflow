@@ -62,4 +62,4 @@ outputs:
   predictions:
     type: File
     outputBinding:
-      glob: 137.nii.gz
+      glob: '*'

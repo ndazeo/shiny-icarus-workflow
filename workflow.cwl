@@ -86,7 +86,7 @@ steps:
     in:
       # TODO: replace `valueFrom` with the Synapse ID to the challenge goldstandard
       - id: synapseid
-        valueFrom: "syn47905425"
+        valueFrom: "syn48366972"
       - id: synapse_config
         source: "#synapseConfig"
     out:
