@@ -86,7 +86,7 @@ steps:
     in:
       # TODO: replace `valueFrom` with the Synapse ID to the challenge goldstandard
       - id: synapseid
-        valueFrom: "syn47905825"
+        valueFrom: "syn47905425"
       - id: synapse_config
         source: "#synapseConfig"
     out:
@@ -274,8 +274,7 @@ steps:
       - id: input
         source: "#run_docker/predictions"
       - id: goldstandard
-        # source: "#download_goldstandard/filepath"
-        valueFrom: "/home/ndazeo/Documents/projects/shiny-icarus/goldstandard"
+        source: "#download_goldstandard/filepath"
       - id: check_validation_finished 
         source: "#check_status/finished"
     out:
