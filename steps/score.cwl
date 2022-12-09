@@ -989,6 +989,15 @@ requirements:
                                   num_threads=1, labels=labels, **metric_kwargs)
             return res
 
+        def untar(directory, tar_filename):
+            """Untar a tar file into a directory
+
+            Args:
+                directory: Path to directory to untar files
+                tar_filename:  tar file path
+            """
+            with tarfile.open(tar_filename, "r") as tar_o:
+                tar_o.extractall(path=directory)
 
         def main():
             import argparse
@@ -1001,9 +1010,11 @@ requirements:
         
             parser.add_argument("-r", "--results", required=True, help="Scoring results")
             
+            untar('output', args.pred)
+            untar('ref', args.ref)
             
             args = parser.parse_args()
-            result = evaluate_folder(args.ref, args.pred, args.l)
+            result = evaluate_folder('output', 'ref', args.l)
             with open(args.results, 'w') as o:
               o.write(json.dumps(result))
 

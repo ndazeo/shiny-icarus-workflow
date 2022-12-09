@@ -208,7 +208,7 @@ def main(syn, args):
     #                    "please check inference docker")
     # CWL has a limit of the array of files it can accept in a folder
     # therefore creating a tarball is sometimes necessary
-    # tar(output_dir, 'outputs.tar.gz')
+    tar(output_dir, 'outputs.tar.gz')
 
 
 if __name__ == '__main__':
