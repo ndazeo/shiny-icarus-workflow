@@ -85,7 +85,7 @@ def tar(directory, tar_filename):
         tar_filename:  tar file path
     """
     with tarfile.open(tar_filename, "w") as tar_o:
-        tar_o.add(directory, arcname='.')
+        tar_o.add(directory, arcname='')
     # TODO: Potentially add code to remove all files that were zipped.
 
 
