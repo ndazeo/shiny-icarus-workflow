@@ -1008,6 +1008,7 @@ def main():
     print("pred", os.listdir('pred'))
     
     result = evaluate_folder('ref', 'pred', args.l)
+    result = {**result, 'submission_status': "SCORED"}
     with open(args.results, 'w') as o:
         o.write(json.dumps(result))
 
