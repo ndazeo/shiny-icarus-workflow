@@ -669,7 +669,7 @@ def main():
                                                                 "format.")
     parser.add_argument('-pred', required=True, type=str, help="Folder containing the predicted segmentations in nifti "
                                                                 "format. File names must match between the folders!")
-    parser.add_argument('-l', nargs='+', type=int, required=False, default=1, help="List of labels to evaluate (-l 1 by default)")
+    parser.add_argument('-l', nargs='+', type=int, required=False, help="List of labels to evaluate (-l 1 by default)")
 
     parser.add_argument("-r", "--results", required=True, help="Scoring results")
     
