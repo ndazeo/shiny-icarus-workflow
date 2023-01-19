@@ -843,7 +843,7 @@ def aggregate_scores(test_ref_pairs,
             else:
                 all_scores["mean"][label][score] = float(np.mean(all_scores["mean"][label][score]))
 
-    return {"Dice": all_scores["mean"][1]["DICE"], "Re": all_scores["mean"][1]["Recall"], "Pr": all_scores["mean"][1]["Precision"], 'submission_status': "SCORED"}
+    return {"Dice": all_scores["mean"][1]["Dice"], "Re": all_scores["mean"][1]["Recall"], "Pr": all_scores["mean"][1]["Precision"], 'submission_status': "SCORED"}
 
 
 def aggregate_scores_for_experiment(score_file,
