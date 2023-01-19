@@ -682,6 +682,7 @@ def main():
     print("pred", os.listdir('pred'))
     
     result = evaluate_folder('ref', 'pred', args.l)
+    print(result)
     with open(args.results, 'w') as o:
         o.write(json.dumps(result))
 
