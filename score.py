@@ -417,30 +417,30 @@ def false_negatives(test=None, reference=None, confusion_matrix=None, **kwargs):
 
 
 ALL_METRICS = {
-    "False Positive Rate": false_positive_rate,
+    #"False Positive Rate": false_positive_rate,
     "Dice": dice,
-    "Jaccard": jaccard,
+    #"Jaccard": jaccard,
     # "Hausdorff Distance": hausdorff_distance,
     # "Hausdorff Distance 95": hausdorff_distance_95,
     "Precision": precision,
-    "Recall": recall,
+    "Recall": recall
     # "Avg. Symmetric Surface Distance": avg_surface_distance_symmetric,
     # "Avg. Surface Distance": avg_surface_distance,
-    "Accuracy": accuracy,
-    "False Omission Rate": false_omission_rate,
-    "Negative Predictive Value": negative_predictive_value,
-    "False Negative Rate": false_negative_rate,
-    "True Negative Rate": true_negative_rate,
-    "False Discovery Rate": false_discovery_rate,
-    "Total Positives Test": total_positives_test,
-    "Total Negatives Test": total_negatives_test,
-    "Total Positives Reference": total_positives_reference,
-    "total Negatives Reference": total_negatives_reference,
+    #"Accuracy": accuracy,
+    #"False Omission Rate": false_omission_rate,
+    #"Negative Predictive Value": negative_predictive_value,
+    #"False Negative Rate": false_negative_rate,
+    #"True Negative Rate": true_negative_rate,
+    #"False Discovery Rate": false_discovery_rate,
+    #"Total Positives Test": total_positives_test,
+    #"Total Negatives Test": total_negatives_test,
+    #"Total Positives Reference": total_positives_reference,
+    #"total Negatives Reference": total_negatives_reference,
     ###----------------added by Camila
-    "True Positives": true_positives,
-    "False Positives": false_positives,
-    "True Negatives": true_negatives,
-    "False Negatives": false_negatives#,
+    #"True Positives": true_positives,
+    #"False Positives": false_positives,
+    #"True Negatives": true_negatives,
+    #"False Negatives": false_negatives#,
     # "clDice": clDice,
     # "clRecall": clrecall,
     # "clPrecision": clprecision,
@@ -459,36 +459,12 @@ class Evaluator:
     """
 
     default_metrics = [
-        "False Positive Rate",
         "Dice",
-        "Jaccard",
         "Precision",
-        "Recall",
-        "Accuracy",
-        "False Omission Rate",
-        "Negative Predictive Value",
-        "False Negative Rate",
-        "True Negative Rate",
-        "False Discovery Rate",
-        "Total Positives Test",
-        "Total Positives Reference",
-        "True Positives",
-        "False Positives",
-        "True Negatives",
-        "False Negatives"#,
-        # "clDice",
-        # "clRecall",
-        # "clPrecision",
-        # "clDiceski",
-        # "clRecallski",
-        # "clPrecisionski"
+        "Recall"
     ]
 
     default_advanced_metrics = [
-        #"Hausdorff Distance",
-        #"Hausdorff Distance 95",
-        #"Avg. Surface Distance",
-        #"Avg. Symmetric Surface Distance"
     ]
 
     def __init__(self,
@@ -838,7 +814,6 @@ def aggregate_scores(test_ref_pairs,
     all_scores = OrderedDict()
     all_scores["all"] = []
     all_scores["mean"] = OrderedDict()
-    all_scores["sum"] = OrderedDict()
 
     test = [i[0] for i in test_ref_pairs]
     ref = [i[1] for i in test_ref_pairs]
@@ -856,22 +831,10 @@ def aggregate_scores(test_ref_pairs,
                 continue
             if label not in all_scores["mean"]:
                 all_scores["mean"][label] = OrderedDict()
-            # ------- added by Camila
-            if label not in all_scores["sum"]:
-                all_scores["sum"][label] = OrderedDict()
-            # -----------
             for score, value in score_dict.items():
                 if score not in all_scores["mean"][label]:
                     all_scores["mean"][label][score] = []
-                # ------- added by Camila
-                if score not in all_scores["sum"][label] and score in ["True Positives", "False Positives", "True Negatives", "False Negatives", "clDice"]:
-                    all_scores["sum"][label][score] = []
-                # ----------    
                 all_scores["mean"][label][score].append(value)
-                # ------- added by Camila
-                if score in ["True Positives", "False Positives", "True Negatives", "False Negatives", "clDice"]:
-                    all_scores["sum"][label][score].append(value)
-                # ---------------
 
     for label in all_scores["mean"]:
         for score in all_scores["mean"][label]:
@@ -879,36 +842,8 @@ def aggregate_scores(test_ref_pairs,
                 all_scores["mean"][label][score] = float(np.nanmean(all_scores["mean"][label][score]))
             else:
                 all_scores["mean"][label][score] = float(np.mean(all_scores["mean"][label][score]))
-    
-    # ------- added by Camila
-    for label in all_scores["sum"]:
-        for score in all_scores["sum"][label]:
-            all_scores["sum"][label][score] = float(np.sum(all_scores["sum"][label][score]))
-    #for label in all_scores["sum"]:
-        all_scores["sum"][label]["Sensitivity"] = float(all_scores["sum"][label]["True Positives"] / (all_scores["sum"][label]["True Positives"] + all_scores["sum"][label]["False Negatives"]))
-        all_scores["sum"][label]["Specificity"] = float(all_scores["sum"][label]["True Negatives"] / (all_scores["sum"][label]["True Negatives"] + all_scores["sum"][label]["False Positives"]))
-        all_scores["sum"][label]["Precision"] = float(all_scores["sum"][label]["True Positives"] / (all_scores["sum"][label]["True Positives"] + all_scores["sum"][label]["False Positives"]))
-        all_scores["sum"][label]["Accuracy"] = float((all_scores["sum"][label]["True Positives"] + all_scores["sum"][label]["True Negatives"])/ (all_scores["sum"][label]["True Positives"] + all_scores["sum"][label]["False Negatives"] + all_scores["sum"][label]["False Positives"] + all_scores["sum"][label]["True Negatives"]))
-        all_scores["sum"][label]["DICE"] = float(2.*(all_scores["sum"][label]["True Positives"])/ (2*all_scores["sum"][label]["True Positives"] + all_scores["sum"][label]["False Negatives"] + all_scores["sum"][label]["False Positives"]))
-        #all_scores["sum"][label]["clDice"] = float(all_scores["sum"][label]["clDice"]/len(all_res))
-    # ------------------
 
-    # save to file if desired
-    # we create a hopefully unique id by hashing the entire output dictionary
-    if json_output_file is not None:
-        json_dict = OrderedDict()
-        json_dict["name"] = json_name
-        json_dict["description"] = json_description
-        timestamp = datetime.today()
-        json_dict["timestamp"] = str(timestamp)
-        json_dict["task"] = json_task
-        json_dict["author"] = json_author
-        json_dict["results"] = all_scores
-        json_dict["id"] = hashlib.md5(json.dumps(json_dict).encode("utf-8")).hexdigest()[:12]
-        writejson(json_dict, json_output_file)
-
-
-    return all_scores
+    return {"Dice": all_scores["mean"][1]["DICE"], "Re": all_scores["mean"][1]["Recall"], "Pr": all_scores["mean"][1]["Precision"], 'submission_status': "SCORED"}
 
 
 def aggregate_scores_for_experiment(score_file,
@@ -995,7 +930,7 @@ def main():
                                                                 "format.")
     parser.add_argument('-pred', required=True, type=str, help="Folder containing the predicted segmentations in nifti "
                                                                 "format. File names must match between the folders!")
-    parser.add_argument('-l', nargs='+', type=int, required=False, help="List of labels to evaluate (-l 1 by default)")
+    parser.add_argument('-l', nargs='+', type=int, required=False, default=1, help="List of labels to evaluate (-l 1 by default)")
 
     parser.add_argument("-r", "--results", required=True, help="Scoring results")
     
@@ -1008,7 +943,6 @@ def main():
     print("pred", os.listdir('pred'))
     
     result = evaluate_folder('ref', 'pred', args.l)
-    result = {**result, 'submission_status': "SCORED"}
     with open(args.results, 'w') as o:
         o.write(json.dumps(result))
 
