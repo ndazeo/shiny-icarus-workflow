@@ -12,8 +12,6 @@ import os
 import collections
 import inspect
 import json
-import hashlib
-from datetime import datetime
 from multiprocessing.pool import Pool
 import numpy as np
 #import pandas as pd
@@ -183,24 +181,6 @@ def dice(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting=T
     return float(2. * tp / (2 * tp + fp + fn))
 
 
-def jaccard(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting=True, **kwargs):
-    """TP / (TP + FP + FN)"""
-
-    if confusion_matrix is None:
-        confusion_matrix = ConfusionMatrix(test, reference)
-
-    tp, fp, tn, fn = confusion_matrix.get_matrix()
-    test_empty, test_full, reference_empty, reference_full = confusion_matrix.get_existence()
-
-    if test_empty and reference_empty:
-        if nan_for_nonexisting:
-            return float("NaN")
-        else:
-            return 0.
-
-    return float(tp / (tp + fp + fn))
-
-
 def precision(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting=True, **kwargs):
     """TP / (TP + FP)"""
 
@@ -219,7 +199,7 @@ def precision(test=None, reference=None, confusion_matrix=None, nan_for_nonexist
     return float(tp / (tp + fp))
 
 
-def sensitivity(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting=True, **kwargs):
+def recall(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting=True, **kwargs):
     """TP / (TP + FN)"""
 
     if confusion_matrix is None:
@@ -237,210 +217,13 @@ def sensitivity(test=None, reference=None, confusion_matrix=None, nan_for_nonexi
     return float(tp / (tp + fn))
 
 
-def recall(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting=True, **kwargs):
-    """TP / (TP + FN)"""
 
-    return sensitivity(test, reference, confusion_matrix, nan_for_nonexisting, **kwargs)
-
-
-def specificity(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting=True, **kwargs):
-    """TN / (TN + FP)"""
-
-    if confusion_matrix is None:
-        confusion_matrix = ConfusionMatrix(test, reference)
-
-    tp, fp, tn, fn = confusion_matrix.get_matrix()
-    test_empty, test_full, reference_empty, reference_full = confusion_matrix.get_existence()
-
-    if reference_full:
-        if nan_for_nonexisting:
-            return float("NaN")
-        else:
-            return 0.
-
-    return float(tn / (tn + fp))
-
-
-def accuracy(test=None, reference=None, confusion_matrix=None, **kwargs):
-    """(TP + TN) / (TP + FP + FN + TN)"""
-
-    if confusion_matrix is None:
-        confusion_matrix = ConfusionMatrix(test, reference)
-
-    tp, fp, tn, fn = confusion_matrix.get_matrix()
-
-    return float((tp + tn) / (tp + fp + tn + fn))
-
-
-def fscore(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting=True, beta=1., **kwargs):
-    """(1 + b^2) * TP / ((1 + b^2) * TP + b^2 * FN + FP)"""
-
-    precision_ = precision(test, reference, confusion_matrix, nan_for_nonexisting)
-    recall_ = recall(test, reference, confusion_matrix, nan_for_nonexisting)
-
-    return (1 + beta*beta) * precision_ * recall_ /\
-        ((beta*beta * precision_) + recall_)
-
-
-def false_positive_rate(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting=True, **kwargs):
-    """FP / (FP + TN)"""
-
-    return 1 - specificity(test, reference, confusion_matrix, nan_for_nonexisting)
-
-
-def false_omission_rate(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting=True, **kwargs):
-    """FN / (TN + FN)"""
-
-    if confusion_matrix is None:
-        confusion_matrix = ConfusionMatrix(test, reference)
-
-    tp, fp, tn, fn = confusion_matrix.get_matrix()
-    test_empty, test_full, reference_empty, reference_full = confusion_matrix.get_existence()
-
-    if test_full:
-        if nan_for_nonexisting:
-            return float("NaN")
-        else:
-            return 0.
-
-    return float(fn / (fn + tn))
-
-
-def false_negative_rate(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting=True, **kwargs):
-    """FN / (TP + FN)"""
-
-    return 1 - sensitivity(test, reference, confusion_matrix, nan_for_nonexisting)
-
-
-def true_negative_rate(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting=True, **kwargs):
-    """TN / (TN + FP)"""
-
-    return specificity(test, reference, confusion_matrix, nan_for_nonexisting)
-
-
-def false_discovery_rate(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting=True, **kwargs):
-    """FP / (TP + FP)"""
-
-    return 1 - precision(test, reference, confusion_matrix, nan_for_nonexisting)
-
-
-def negative_predictive_value(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting=True, **kwargs):
-    """TN / (TN + FN)"""
-
-    return 1 - false_omission_rate(test, reference, confusion_matrix, nan_for_nonexisting)
-
-
-def total_positives_test(test=None, reference=None, confusion_matrix=None, **kwargs):
-    """TP + FP"""
-
-    if confusion_matrix is None:
-        confusion_matrix = ConfusionMatrix(test, reference)
-
-    tp, fp, tn, fn = confusion_matrix.get_matrix()
-
-    return tp + fp
-
-
-def total_negatives_test(test=None, reference=None, confusion_matrix=None, **kwargs):
-    """TN + FN"""
-
-    if confusion_matrix is None:
-        confusion_matrix = ConfusionMatrix(test, reference)
-
-    tp, fp, tn, fn = confusion_matrix.get_matrix()
-
-    return tn + fn
-
-
-def total_positives_reference(test=None, reference=None, confusion_matrix=None, **kwargs):
-    """TP + FN"""
-
-    if confusion_matrix is None:
-        confusion_matrix = ConfusionMatrix(test, reference)
-
-    tp, fp, tn, fn = confusion_matrix.get_matrix()
-
-    return tp + fn
-
-
-def total_negatives_reference(test=None, reference=None, confusion_matrix=None, **kwargs):
-    """TN + FP"""
-
-    if confusion_matrix is None:
-        confusion_matrix = ConfusionMatrix(test, reference)
-
-    tp, fp, tn, fn = confusion_matrix.get_matrix()
-
-    return tn + fp
-
-
-## ---------- added by Camila
-def true_positives(test=None, reference=None, confusion_matrix=None, **kwargs):
-    """TP"""
-
-    if confusion_matrix is None:
-        confusion_matrix = ConfusionMatrix(test, reference)
-
-    tp, fp, tn, fn = confusion_matrix.get_matrix()
-
-    return tp
-
-def false_positives(test=None, reference=None, confusion_matrix=None, **kwargs):
-    """TP"""
-
-    if confusion_matrix is None:
-        confusion_matrix = ConfusionMatrix(test, reference)
-
-    tp, fp, tn, fn = confusion_matrix.get_matrix()
-
-    return fp
-
-def true_negatives(test=None, reference=None, confusion_matrix=None, **kwargs):
-    """TP"""
-
-    if confusion_matrix is None:
-        confusion_matrix = ConfusionMatrix(test, reference)
-
-    tp, fp, tn, fn = confusion_matrix.get_matrix()
-
-    return tn
-
-def false_negatives(test=None, reference=None, confusion_matrix=None, **kwargs):
-    """TP"""
-
-    if confusion_matrix is None:
-        confusion_matrix = ConfusionMatrix(test, reference)
-
-    tp, fp, tn, fn = confusion_matrix.get_matrix()
-
-    return fn
 
 
 ALL_METRICS = {
-    "False Positive Rate": false_positive_rate,
     "Dice": dice,
-    "Jaccard": jaccard,
-    # "Hausdorff Distance": hausdorff_distance,
-    # "Hausdorff Distance 95": hausdorff_distance_95,
     "Precision": precision,
-    "Recall": recall,
-    # "Avg. Symmetric Surface Distance": avg_surface_distance_symmetric,
-    # "Avg. Surface Distance": avg_surface_distance,
-    "Accuracy": accuracy,
-    "False Omission Rate": false_omission_rate,
-    "Negative Predictive Value": negative_predictive_value,
-    "False Negative Rate": false_negative_rate,
-    "True Negative Rate": true_negative_rate,
-    "False Discovery Rate": false_discovery_rate,
-    "Total Positives Test": total_positives_test,
-    "Total Negatives Test": total_negatives_test,
-    "Total Positives Reference": total_positives_reference,
-    "total Negatives Reference": total_negatives_reference,
-    ###----------------added by Camila
-    "True Positives": true_positives,
-    "False Positives": false_positives,
-    "True Negatives": true_negatives,
-    "False Negatives": false_negatives#,
+    "Recall": recall
     # "clDice": clDice,
     # "clRecall": clrecall,
     # "clPrecision": clprecision,
@@ -459,36 +242,12 @@ class Evaluator:
     """
 
     default_metrics = [
-        "False Positive Rate",
         "Dice",
-        "Jaccard",
         "Precision",
-        "Recall",
-        "Accuracy",
-        "False Omission Rate",
-        "Negative Predictive Value",
-        "False Negative Rate",
-        "True Negative Rate",
-        "False Discovery Rate",
-        "Total Positives Test",
-        "Total Positives Reference",
-        "True Positives",
-        "False Positives",
-        "True Negatives",
-        "False Negatives"#,
-        # "clDice",
-        # "clRecall",
-        # "clPrecision",
-        # "clDiceski",
-        # "clRecallski",
-        # "clPrecisionski"
+        "Recall"
     ]
 
     default_advanced_metrics = [
-        #"Hausdorff Distance",
-        #"Hausdorff Distance 95",
-        #"Avg. Surface Distance",
-        #"Avg. Symmetric Surface Distance"
     ]
 
     def __init__(self,
@@ -838,7 +597,6 @@ def aggregate_scores(test_ref_pairs,
     all_scores = OrderedDict()
     all_scores["all"] = []
     all_scores["mean"] = OrderedDict()
-    all_scores["sum"] = OrderedDict()
 
     test = [i[0] for i in test_ref_pairs]
     ref = [i[1] for i in test_ref_pairs]
@@ -856,22 +614,10 @@ def aggregate_scores(test_ref_pairs,
                 continue
             if label not in all_scores["mean"]:
                 all_scores["mean"][label] = OrderedDict()
-            # ------- added by Camila
-            if label not in all_scores["sum"]:
-                all_scores["sum"][label] = OrderedDict()
-            # -----------
             for score, value in score_dict.items():
                 if score not in all_scores["mean"][label]:
                     all_scores["mean"][label][score] = []
-                # ------- added by Camila
-                if score not in all_scores["sum"][label] and score in ["True Positives", "False Positives", "True Negatives", "False Negatives", "clDice"]:
-                    all_scores["sum"][label][score] = []
-                # ----------    
                 all_scores["mean"][label][score].append(value)
-                # ------- added by Camila
-                if score in ["True Positives", "False Positives", "True Negatives", "False Negatives", "clDice"]:
-                    all_scores["sum"][label][score].append(value)
-                # ---------------
 
     for label in all_scores["mean"]:
         for score in all_scores["mean"][label]:
@@ -879,80 +625,8 @@ def aggregate_scores(test_ref_pairs,
                 all_scores["mean"][label][score] = float(np.nanmean(all_scores["mean"][label][score]))
             else:
                 all_scores["mean"][label][score] = float(np.mean(all_scores["mean"][label][score]))
-    
-    # ------- added by Camila
-    for label in all_scores["sum"]:
-        for score in all_scores["sum"][label]:
-            all_scores["sum"][label][score] = float(np.sum(all_scores["sum"][label][score]))
-    #for label in all_scores["sum"]:
-        all_scores["sum"][label]["Sensitivity"] = float(all_scores["sum"][label]["True Positives"] / (all_scores["sum"][label]["True Positives"] + all_scores["sum"][label]["False Negatives"]))
-        all_scores["sum"][label]["Specificity"] = float(all_scores["sum"][label]["True Negatives"] / (all_scores["sum"][label]["True Negatives"] + all_scores["sum"][label]["False Positives"]))
-        all_scores["sum"][label]["Precision"] = float(all_scores["sum"][label]["True Positives"] / (all_scores["sum"][label]["True Positives"] + all_scores["sum"][label]["False Positives"]))
-        all_scores["sum"][label]["Accuracy"] = float((all_scores["sum"][label]["True Positives"] + all_scores["sum"][label]["True Negatives"])/ (all_scores["sum"][label]["True Positives"] + all_scores["sum"][label]["False Negatives"] + all_scores["sum"][label]["False Positives"] + all_scores["sum"][label]["True Negatives"]))
-        all_scores["sum"][label]["DICE"] = float(2.*(all_scores["sum"][label]["True Positives"])/ (2*all_scores["sum"][label]["True Positives"] + all_scores["sum"][label]["False Negatives"] + all_scores["sum"][label]["False Positives"]))
-        #all_scores["sum"][label]["clDice"] = float(all_scores["sum"][label]["clDice"]/len(all_res))
-    # ------------------
 
-    # save to file if desired
-    # we create a hopefully unique id by hashing the entire output dictionary
-    if json_output_file is not None:
-        json_dict = OrderedDict()
-        json_dict["name"] = json_name
-        json_dict["description"] = json_description
-        timestamp = datetime.today()
-        json_dict["timestamp"] = str(timestamp)
-        json_dict["task"] = json_task
-        json_dict["author"] = json_author
-        json_dict["results"] = all_scores
-        json_dict["id"] = hashlib.md5(json.dumps(json_dict).encode("utf-8")).hexdigest()[:12]
-        writejson(json_dict, json_output_file)
-
-
-    return all_scores
-
-
-def aggregate_scores_for_experiment(score_file,
-                                    labels=None,
-                                    metrics=Evaluator.default_metrics,
-                                    nanmean=True,
-                                    json_output_file=None,
-                                    json_name="",
-                                    json_description="",
-                                    json_author="Fabian",
-                                    json_task=""):
-
-    scores = np.load(score_file)
-    scores_mean = scores.mean(0)
-    if labels is None:
-        labels = list(map(str, range(scores.shape[1])))
-
-    results = []
-    results_mean = OrderedDict()
-    for i in range(scores.shape[0]):
-        results.append(OrderedDict())
-        for l, label in enumerate(labels):
-            results[-1][label] = OrderedDict()
-            results_mean[label] = OrderedDict()
-            for m, metric in enumerate(metrics):
-                results[-1][label][metric] = float(scores[i][l][m])
-                results_mean[label][metric] = float(scores_mean[l][m])
-
-    json_dict = OrderedDict()
-    json_dict["name"] = json_name
-    json_dict["description"] = json_description
-    timestamp = datetime.today()
-    json_dict["timestamp"] = str(timestamp)
-    json_dict["task"] = json_task
-    json_dict["author"] = json_author
-    json_dict["results"] = {"all": results, "mean": results_mean}
-    json_dict["id"] = hashlib.md5(json.dumps(json_dict).encode("utf-8")).hexdigest()[:12]
-    if json_output_file is not None:
-        json_output_file = open(json_output_file, "w")
-        json.dump(json_dict, json_output_file, indent=4, separators=(",", ": "))
-        json_output_file.close()
-
-    return json_dict
-
+    return {"Dice": all_scores["mean"]["1"]["Dice"], "Re": all_scores["mean"]["1"]["Recall"], "Pr": all_scores["mean"]["1"]["Precision"], 'submission_status': "SCORED"}
 
 def evaluate_folder(folder_with_gts: str, folder_with_predictions: str, labels: tuple = (1), **metric_kwargs):
     """
@@ -1008,7 +682,7 @@ def main():
     print("pred", os.listdir('pred'))
     
     result = evaluate_folder('ref', 'pred', args.l)
-    result = {'dice': 1, 'submission_status': "SCORED"}
+    print(result)
     with open(args.results, 'w') as o:
         o.write(json.dumps(result))
 
