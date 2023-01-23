@@ -129,6 +129,7 @@ def main(syn, args):
     test_dir = os.path.join(os.getcwd(), "test")
     #output_dir = os.getcwd()
     input_dir = "/shiny-icarus/pairs"
+    print(os.listdir('/'))
     pairs = os.listdir( input_dir )
     input_dir = os.path.join(input_dir, random.choice(pairs))
 
