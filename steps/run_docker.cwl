@@ -7,6 +7,8 @@ class: CommandLineTool
 baseCommand: python3
 
 inputs:
+  - id: input
+    type: Directory
   - id: submissionid
     type: int
   - id: docker_repository
@@ -56,9 +58,7 @@ requirements:
   - class: InitialWorkDirRequirement
     listing:
     - entryname: /shiny-icarus
-      entry: /shiny-icarus
-      class: Directory
-      writable: false
+      entry: $(inputs.input)
 
 outputs:
   predictions:
