@@ -53,6 +53,11 @@ requirements:
         entry: |
           {"auths": {"$(inputs.docker_registry)": {"auth": "$(inputs.docker_authentication)"}}}
   - class: InlineJavascriptRequirement
+  - class: InitialWorkDirRequirement
+    listing:
+    - entryname: /shiny-icarus
+      entry: /shiny-icarus
+      writable: false
 
 outputs:
   predictions:
