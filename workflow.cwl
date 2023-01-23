@@ -86,7 +86,7 @@ steps:
     in:
       # TODO: replace `valueFrom` with the Synapse ID to the challenge goldstandard
       - id: synapseid
-        valueFrom: "syn48374539"
+        valueFrom: "syn50916055"
       - id: synapse_config
         source: "#synapseConfig"
     out:
@@ -168,20 +168,37 @@ steps:
       # OPTIONAL: set `default` to `false` if log file should not be uploaded to Synapse
       - id: store
         default: true
-      - id: input_dir
-        valueFrom: "/input"
       - id: docker_script
         default:
           class: File
           location: "run_docker.py"
     out:
       - id: predictions
+      - id: testtest
 
   upload_results:
     run: https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v3.1/cwl/upload_to_synapse.cwl
     in:
       - id: infile
         source: "#run_docker/predictions"
+      - id: parentid
+        source: "#adminUploadSynId"
+      - id: used_entity
+        source: "#get_docker_submission/entity_id"
+      - id: executed_entity
+        source: "#workflowSynapseId"
+      - id: synapse_config
+        source: "#synapseConfig"
+    out:
+      - id: uploaded_fileid
+      - id: uploaded_file_version
+      - id: results
+
+  upload_testtest:
+    run: https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v3.1/cwl/upload_to_synapse.cwl
+    in:
+      - id: infile
+        source: "#run_docker/testtest"
       - id: parentid
         source: "#adminUploadSynId"
       - id: used_entity

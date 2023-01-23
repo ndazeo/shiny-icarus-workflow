@@ -624,8 +624,8 @@ def evaluate_folder(folder_with_gts: str, folder_with_predictions: str, labels: 
     files_pred = [l(folder_with_predictions, i) for i in os.listdir(folder_with_predictions) if os.path.isfile(os.path.join(folder_with_predictions, i))
             and (i.endswith(".nii.gz"))]
     files_pred.sort()
-    assert all([i in files_pred for i in files_gt]), "files missing in folder_with_predictions"
-    assert all([i in files_gt for i in files_pred]), "files missing in folder_with_gts"
+    #assert all([i in files_pred for i in files_gt]), "files missing in folder_with_predictions"
+    #assert all([i in files_gt for i in files_pred]), "files missing in folder_with_gts"
     test_ref_pairs = [(os.path.join(folder_with_predictions, i), os.path.join(folder_with_gts, i)) for i in files_pred]
     res = aggregate_scores(test_ref_pairs, json_output_file=os.path.join(folder_with_predictions, "summary.json"),
                             num_threads=1, labels=labels, **metric_kwargs)

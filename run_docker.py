@@ -3,6 +3,7 @@ from __future__ import print_function
 import argparse
 import getpass
 import os
+import random
 import tarfile
 import time
 
@@ -125,8 +126,11 @@ def main(syn, args):
 
     # These are the volumes that you want to mount onto your docker container
     output_dir = os.path.join(os.getcwd(), "output")
+    test_dir = os.path.join(os.getcwd(), "test")
     #output_dir = os.getcwd()
-    input_dir = args.input_dir
+    input_dir = "/shiny-icarus/pairs"
+    pairs = os.listdir( input_dir )
+    input_dir = os.path.join(input_dir, random.choice(pairs))
 
     print("mounting volumes")
     # These are the locations on the docker that you want your mounted
@@ -208,7 +212,14 @@ def main(syn, args):
     #                    "please check inference docker")
     # CWL has a limit of the array of files it can accept in a folder
     # therefore creating a tarball is sometimes necessary
+
+    results = os.listdir( output_dir )
+    os.makedirs(test_dir, exist_ok=True)
+    testset = [result for result in results if result.startswith("t_")]
+    for test in testset:
+        os.rename(os.path.join(output_dir, test), os.path.join(test_dir, test))
     tar(output_dir, 'outputs.tar.gz')
+    tar(test_dir, 'testtest.tar.gz')
 
 
 if __name__ == '__main__':
