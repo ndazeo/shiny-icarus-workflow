@@ -152,7 +152,7 @@ steps:
       - id: input
         default:
           class: Directory
-          location: shiny-icarus
+          location: "/shiny-icarus"
       - id: docker_repository
         source: "#get_docker_submission/docker_repository"
       - id: docker_digest
