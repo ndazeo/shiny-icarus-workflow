@@ -55,8 +55,8 @@ requirements:
   - class: InlineJavascriptRequirement
   - class: InitialWorkDirRequirement
     listing:
-      entry: "$({class: 'Directory', listing: []})"
     - entryname: /shiny-icarus
+      entry: "$({class: 'Directory', listing: []})"
       writable: false
 
 outputs:
