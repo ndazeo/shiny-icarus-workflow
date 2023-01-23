@@ -56,7 +56,8 @@ requirements:
   - class: InitialWorkDirRequirement
     listing:
     - entryname: /shiny-icarus
-      entry: "$({class: 'Directory', listing: []})"
+      entry: /shiny-icarus
+      class: Directory
       writable: false
 
 outputs:
