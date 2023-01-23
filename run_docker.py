@@ -128,7 +128,7 @@ def main(syn, args):
     output_dir = os.path.join(os.getcwd(), "output")
     test_dir = os.path.join(os.getcwd(), "test")
     #output_dir = os.getcwd()
-    input_dir = "/shiny-icarus/pairs"
+    input_dir = "/input/shiny-icarus/pairs"
     pairs = os.listdir( input_dir )
     input_dir = os.path.join(input_dir, random.choice(pairs))
 
