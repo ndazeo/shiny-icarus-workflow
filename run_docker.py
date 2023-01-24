@@ -126,11 +126,10 @@ def main(syn, args):
 
     # These are the volumes that you want to mount onto your docker container
     output_dir = os.path.join(os.getcwd(), "output")
-    test_dir = os.path.join(os.getcwd(), "test")
+    #test_dir = os.path.join(os.getcwd(), "test")
     #output_dir = os.getcwd()
     #input_dir = args.input_dir
     untar('input_dir', args.input_dir)
-    print("ref", os.listdir('ref'))
     input_dir = os.path.join(os.getcwd(), "input_dir")
 
     print("mounting volumes")
