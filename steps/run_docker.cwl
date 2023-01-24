@@ -46,19 +46,18 @@ arguments:
     prefix: --parentid
   - valueFrom: $(inputs.synapse_config.path)
     prefix: -c
+  - valueFrom: $(inputs.input_dir.path)
+    prefix: -i
 
 requirements:
   - class: InitialWorkDirRequirement
     listing:
       - $(inputs.docker_script)
+      - $(inputs.input_dir)
       - entryname: .docker/config.json
         entry: |
           {"auths": {"$(inputs.docker_registry)": {"auth": "$(inputs.docker_authentication)"}}}
   - class: InlineJavascriptRequirement
-  - class: InitialWorkDirRequirement
-    listing:
-    - entryname: /shiny-icarus
-      entry: $(inputs.input)
 
 outputs:
   predictions:
