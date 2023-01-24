@@ -128,10 +128,10 @@ def main(syn, args):
     output_dir = os.path.join(os.getcwd(), "output")
     test_dir = os.path.join(os.getcwd(), "test")
     #output_dir = os.getcwd()
-    input_dir = "/shiny-icarus/pairs"
-    print(os.listdir('/'))
-    pairs = os.listdir( input_dir )
-    input_dir = os.path.join(input_dir, random.choice(pairs))
+    #input_dir = args.input_dir
+    untar('input_dir', args.input_dir)
+    print("ref", os.listdir('ref'))
+    input_dir = os.path.join(os.getcwd(), "input_dir")
 
     print("mounting volumes")
     # These are the locations on the docker that you want your mounted

@@ -81,12 +81,27 @@ steps:
       - id: docker_registry
       - id: docker_authentication
 
+  download_rawfiles:
+    run: https://raw.githubusercontent.com/Sage-Bionetworks-Workflows/cwl-tool-synapseclient/v1.4/cwl/synapse-get-tool.cwl
+    in:
+      # Download raw files to run docker
+      - id: synapseid
+        valueFrom: "syn50919873"
+        # syn50919873 one train file
+        # syn50919862 three train files
+      - id: synapse_config
+        source: "#synapseConfig"
+    out:
+      - id: filepath
+
   download_goldstandard:
     run: https://raw.githubusercontent.com/Sage-Bionetworks-Workflows/cwl-tool-synapseclient/v1.4/cwl/synapse-get-tool.cwl
     in:
       # TODO: replace `valueFrom` with the Synapse ID to the challenge goldstandard
       - id: synapseid
-        valueFrom: "syn50916055"
+        valueFrom: "syn50919879"
+        # syn50919876 three train get
+        # syn50919879 one train gt
       - id: synapse_config
         source: "#synapseConfig"
     out:
@@ -172,6 +187,8 @@ steps:
       # OPTIONAL: set `default` to `false` if log file should not be uploaded to Synapse
       - id: store
         default: true
+      - id: input_dir
+        source: "#download_rawfiles/filepath"
       - id: docker_script
         default:
           class: File
