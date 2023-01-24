@@ -14,9 +14,9 @@ import inspect
 import json
 from multiprocessing.pool import Pool
 import numpy as np
-#import pandas as pd
 import SimpleITK as sitk
 from collections import OrderedDict
+from skimage.morphology import skeletonize
 import json
 
 def writejson(dict, outputFile):
@@ -46,8 +46,8 @@ class ConfusionMatrix:
         self.test_full = None
         self.set_reference(reference)
         self.set_test(test)
-        #self.skirefcl = None
-        #self.skitestcl = None
+        self.skirefcl = None
+        self.skitestcl = None
 
     def set_test(self, test):
 
@@ -58,23 +58,6 @@ class ConfusionMatrix:
 
         self.reference = reference
         self.reset()
-
-    # ------ added by Camila
-    def set_testcl(self, testcl):
-
-        self.testcl = testcl
-        self.resetcl()
-
-    def set_referencecl(self, referencecl):
-
-        self.referencecl = referencecl
-        self.resetcl()
-
-    def resetcl(self):
-        self.clp2vollintersect = None
-        self.clp2volltotalcl = None
-        self.cll2volpintersect = None
-        self.cll2volptotalcl = None
 
     def set_skirefcl(self, refcl):
         self.skirefcl=refcl
@@ -89,25 +72,6 @@ class ConfusionMatrix:
         self.clp2volltotalclski = None
         self.cll2volpintersectski = None
         self.cll2volptotalclski = None
-
-    # def computeSkiCl(self):
-    #     if self.test is not None:
-    #         self.skitestcl = skeletonize(self.test)
-    #         if self.skitestcl is None:
-    #             print("test no skeletonizo")
-    #     if self.reference is not None:
-    #         self.skirefcl = skeletonize(self.reference)
-    #         if self.skirefcl is None:
-    #             print("ref no skeletonizo")
-    #     if (self.skirefcl is None):
-    #         print("ref no está")
-    #     if (self.skitestcl is None):
-    #         print("test no está")
-
-
-
-    # ------------------------
-    
 
     def reset(self):
 
@@ -161,6 +125,50 @@ class ConfusionMatrix:
                 break
 
         return self.test_empty, self.test_full, self.reference_empty, self.reference_full
+
+    #clDice
+    def compute_clDice(self):
+        if self.testcl is not None and self.referencecl is not None:
+            self.clp2vollintersect = int(((self.testcl != 0) * (self.reference != 0)).sum())
+            self.clp2volltotalcl = int((self.testcl!=0).sum())
+            self.cll2volpintersect = int(((self.referencecl != 0) * (self.test != 0)).sum())
+            self.cll2volptotalcl = int((self.referencecl!=0).sum())
+        else:
+            self.clp2vollintersect = 0
+            self.clp2volltotalcl = 0
+            self.cll2volpintersect = 0
+            self.cll2volptotalcl = 0
+
+    def get_clvalues(self):
+
+        for entry in ( self.clp2vollintersect, self.clp2volltotalcl, self.cll2volpintersect, self.cll2volptotalcl):
+            if entry is None:
+                self.compute_clDice()
+                break
+
+        return self.clp2vollintersect, self.clp2volltotalcl, self.cll2volpintersect, self.cll2volptotalcl
+
+    def compute_skiclDice(self):
+        if self.skitestcl is not None and self.skirefcl is not None:
+            self.clp2vollintersectski = int(((self.skitestcl != 0) * (self.reference != 0)).sum())
+            self.clp2volltotalclski = int((self.skitestcl!=0).sum())
+            self.cll2volpintersectski = int(((self.skirefcl != 0) * (self.test != 0)).sum())
+            self.cll2volptotalclski = int((self.skirefcl!=0).sum())
+        else:
+            self.clp2vollintersectski = 0
+            self.clp2volltotalclski = 0
+            self.cll2volpintersectski = 0
+            self.cll2volptotalclski = 0
+
+    def get_skiclvalues(self):
+        for entry in ( self.clp2vollintersectski, self.clp2volltotalclski, self.cll2volpintersectski, self.cll2volptotalclski):
+            if entry is None:
+                self.compute_skiclDice()
+                break
+
+        return self.clp2vollintersectski, self.clp2volltotalclski, self.cll2volpintersectski, self.cll2volptotalclski
+ 
+
 
 
 def dice(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting=True, **kwargs):
@@ -217,19 +225,51 @@ def recall(test=None, reference=None, confusion_matrix=None, nan_for_nonexisting
     return float(tp / (tp + fn))
 
 
+def skiClPrecision(test=None, reference=None, confusion_matrix=None, **kwargs):
+    #with skimage skeletonize
+    """cl precision"""
+    if confusion_matrix is None:
+        confusion_matrix = ConfusionMatrix(test, reference)
+
+    clp2vollintersect, clp2volltotalcl, cll2volpintersect, cll2volptotalcl = confusion_matrix.get_skiclvalues()
+
+    clp2voll = float(clp2vollintersect/clp2volltotalcl)
+    return clp2voll
+
+def skiClRecall(test=None, reference=None, confusion_matrix=None, **kwargs):
+    #with skimage skeletonize
+    """cl recall"""
+
+    if confusion_matrix is None:
+        confusion_matrix = ConfusionMatrix(test, reference)
+
+    clp2vollintersect, clp2volltotalcl, cll2volpintersect, cll2volptotalcl = confusion_matrix.get_skiclvalues()
+
+    cll2volp= float(cll2volpintersect/cll2volptotalcl)
+    return cll2volp
 
 
+def skiClDice(test=None, reference=None, confusion_matrix=None, **kwargs):
+    #with skimage skeletonize
+    """clDice"""
+    if confusion_matrix is None:
+        confusion_matrix = ConfusionMatrix(test, reference)
+
+    clp2vollintersect, clp2volltotalcl, cll2volpintersect, cll2volptotalcl = confusion_matrix.get_skiclvalues()
+    #precision
+    clp2voll = float(clp2vollintersect/clp2volltotalcl)
+    #recall
+    cll2volp= float(cll2volpintersect/cll2volptotalcl)
+    return ((2*cll2volp*clp2voll)/(clp2voll+cll2volp))
+    
 
 ALL_METRICS = {
     "Dice": dice,
     "Precision": precision,
-    "Recall": recall
-    # "clDice": clDice,
-    # "clRecall": clrecall,
-    # "clPrecision": clprecision,
-    # "clDiceski": skiClDice,
-    # "clRecallski": skiClRecall,
-    # "clPrecisionski": skiClPrecision
+    "Recall": recall,
+    "clDice": skiClDice,
+    "clRecall": skiClRecall,
+    "clPrecision": skiClPrecision
 }
 
 # -------------------------------------- evaluator
@@ -244,11 +284,12 @@ class Evaluator:
     default_metrics = [
         "Dice",
         "Precision",
-        "Recall"
+        "Recall",
+        "clDice",
+        "clRecall",
+        "clPrecision"
     ]
 
-    default_advanced_metrics = [
-    ]
 
     def __init__(self,
                 test=None,
@@ -260,10 +301,8 @@ class Evaluator:
 
         self.test = None
         self.reference = None
-        #------- added by Camila
-        # self.testcl = None
-        # self.referencecl = None
-        # -------- end added by Camila
+        self.testcl = None
+        self.referencecl = None
         self.confusion_matrix = ConfusionMatrix()
         self.labels = None
         self.nan_for_nonexisting = nan_for_nonexisting
@@ -276,14 +315,6 @@ class Evaluator:
         else:
             for m in metrics:
                 self.metrics.append(m)
-
-        self.advanced_metrics = []
-        if advanced_metrics is None:
-            for m in self.default_advanced_metrics:
-                self.advanced_metrics.append(m)
-        else:
-            for m in advanced_metrics:
-                self.advanced_metrics.append(m)
 
         self.set_reference(reference)
         self.set_test(test)
@@ -303,19 +334,15 @@ class Evaluator:
 
         self.reference = reference
 
-    # ---------- added by Camila
+    def set_testcl(self, testcl):
+        """Set the test segmentation."""
 
-    # def set_testcl(self, testcl):
-    #     """Set the test segmentation."""
+        self.testcl = testcl
 
-    #     self.testcl = testcl
+    def set_referencecl(self, referencecl):
+        """Set the reference segmentation."""
 
-    # def set_referencecl(self, referencecl):
-    #     """Set the reference segmentation."""
-
-    #     self.referencecl = referencecl
-
-    # ---------- end added by Camila
+        self.referencecl = referencecl
 
     def set_labels(self, labels):
         """Set the labels.
@@ -408,12 +435,8 @@ class Evaluator:
                 if not hasattr(label, "__iter__"):
                     self.confusion_matrix.set_test(self.test == label)
                     self.confusion_matrix.set_reference(self.reference == label)
-                    # --- added by Camila
-                    # self.confusion_matrix.set_testcl(self.testcl == label)
-                    # self.confusion_matrix.set_referencecl(self.referencecl == label)
-                    # self.confusion_matrix.set_skirefcl(skeletonize(self.reference)==label)
-                    # self.confusion_matrix.set_skitestcl(skeletonize(self.test)==label)
-                    ## ------------------
+                    self.confusion_matrix.set_skirefcl(skeletonize(self.reference)==label)
+                    self.confusion_matrix.set_skitestcl(skeletonize(self.test)==label)
                 else:
                     current_test = 0
                     current_reference = 0
@@ -434,12 +457,8 @@ class Evaluator:
                 self.result[k] = OrderedDict()
                 self.confusion_matrix.set_test(self.test == l)
                 self.confusion_matrix.set_reference(self.reference == l)
-                # --- added by Camila
-                # self.confusion_matrix.set_testcl(self.testcl == l)
-                # self.confusion_matrix.set_referencecl(self.referencecl == l)
-                # self.confusion_matrix.set_skirefcl(skeletonize(self.reference)==l)
-                # self.confusion_matrix.set_skitestcl(skeletonize(self.test)==l)
-                ## ------------------
+                self.confusion_matrix.set_skirefcl(skeletonize(self.reference)==l)
+                self.confusion_matrix.set_skitestcl(skeletonize(self.test)==l)
                 for metric in eval_metrics:
                     self.result[k][metric] = _funcs[metric](confusion_matrix=self.confusion_matrix,
                                                             nan_for_nonexisting=self.nan_for_nonexisting,
@@ -505,34 +524,6 @@ class NiftiEvaluator(Evaluator):
             self.reference_nifti = None
             super(NiftiEvaluator, self).set_reference(reference)
 
-    # -------- added by Camila
-
-    # def computeThinningSITK(self, inputImage):
-    #     thinningFilter = sitk.BinaryThinningImageFilter()
-    #     thinnedImage = thinningFilter.Execute(inputImage)
-    #     return thinnedImage
-
-    # def set_testcl(self):
-    #     """Set the test segmentation."""
-
-    #     if self.test_nifti is not None:            
-    #         self.test_nifticl = self.computeThinningSITK(self.test_nifti)
-    #         super(NiftiEvaluator, self).set_testcl(sitk.GetArrayFromImage(self.test_nifticl))
-    #     else:
-    #         self.test_nifticl = None
-    #         super(NiftiEvaluator, self).set_testcl(None)
-
-    # def set_referencecl(self):
-    #     """Set the reference segmentation."""
-
-    #     if self.reference_nifti is not None:
-    #         self.reference_nifticl = self.computeThinningSITK(self.reference_nifti)
-    #         super(NiftiEvaluator, self).set_referencecl(sitk.GetArrayFromImage(self.reference_nifticl))
-    #     else:
-    #         self.reference_nifticl = None
-    #         super(NiftiEvaluator, self).set_referencecl(None)
-
-    # ----------- end added by Camila
 
     def evaluate(self, test=None, reference=None, voxel_spacing=None, **metric_kwargs):
 
@@ -548,10 +539,6 @@ def run_evaluation(args):
     # evaluate
     evaluator.set_test(test)
     evaluator.set_reference(ref)
-    #------ added by Camila
-    # evaluator.set_testcl()
-    # evaluator.set_referencecl()
-    #---------- end added by Camila
     if evaluator.labels is None:
         evaluator.construct_labels()
     current_scores = evaluator.evaluate(**metric_kwargs)
@@ -566,11 +553,6 @@ def aggregate_scores(test_ref_pairs,
                     evaluator=NiftiEvaluator,
                     labels=None,
                     nanmean=True,
-                    json_output_file=None,
-                    json_name="",
-                    json_description="",
-                    json_author="Camila",
-                    json_task="",
                     num_threads=2,
                     **metric_kwargs):
     """
@@ -579,11 +561,6 @@ def aggregate_scores(test_ref_pairs,
     :param evaluator:
     :param labels: must be a dict of int-> str or a list of int
     :param nanmean:
-    :param json_output_file:
-    :param json_name:
-    :param json_description:
-    :param json_author:
-    :param json_task:
     :param metric_kwargs:
     :return:
     """
@@ -626,7 +603,9 @@ def aggregate_scores(test_ref_pairs,
             else:
                 all_scores["mean"][label][score] = float(np.mean(all_scores["mean"][label][score]))
 
-    return {"Dice": all_scores["mean"]["1"]["Dice"], "Re": all_scores["mean"]["1"]["Recall"], "Pr": all_scores["mean"]["1"]["Precision"], 'submission_status': "SCORED"}
+    return {"Dice": all_scores["mean"]["1"]["Dice"], "Re": all_scores["mean"]["1"]["Recall"], "Pr": all_scores["mean"]["1"]["Precision"],
+        "clDice": all_scores["mean"]["1"]["clDice"], "clRe": all_scores["mean"]["1"]["clRecall"], "clPr": all_scores["mean"]["1"]["clPrecision"], 
+        'submission_status': "SCORED"}
 
 def evaluate_folder(folder_with_gts: str, folder_with_predictions: str, labels: tuple = (1), **metric_kwargs):
     """
@@ -645,8 +624,8 @@ def evaluate_folder(folder_with_gts: str, folder_with_predictions: str, labels: 
     files_pred = [l(folder_with_predictions, i) for i in os.listdir(folder_with_predictions) if os.path.isfile(os.path.join(folder_with_predictions, i))
             and (i.endswith(".nii.gz"))]
     files_pred.sort()
-    assert all([i in files_pred for i in files_gt]), "files missing in folder_with_predictions"
-    assert all([i in files_gt for i in files_pred]), "files missing in folder_with_gts"
+    #assert all([i in files_pred for i in files_gt]), "files missing in folder_with_predictions"
+    #assert all([i in files_gt for i in files_pred]), "files missing in folder_with_gts"
     test_ref_pairs = [(os.path.join(folder_with_predictions, i), os.path.join(folder_with_gts, i)) for i in files_pred]
     res = aggregate_scores(test_ref_pairs, json_output_file=os.path.join(folder_with_predictions, "summary.json"),
                             num_threads=1, labels=labels, **metric_kwargs)

@@ -164,6 +164,10 @@ steps:
   run_docker:
     run: steps/run_docker.cwl
     in:
+      - id: input
+        default:
+          class: Directory
+          location: "/shiny-icarus"
       - id: docker_repository
         source: "#get_docker_submission/docker_repository"
       - id: docker_digest
@@ -191,12 +195,31 @@ steps:
           location: "run_docker.py"
     out:
       - id: predictions
+      - id: testtest
 
   upload_results:
     run: https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v3.1/cwl/upload_to_synapse.cwl
     in:
       - id: infile
         source: "#run_docker/predictions"
+      - id: parentid
+        source: "#adminUploadSynId"
+      - id: used_entity
+        source: "#get_docker_submission/entity_id"
+      - id: executed_entity
+        source: "#workflowSynapseId"
+      - id: synapse_config
+        source: "#synapseConfig"
+    out:
+      - id: uploaded_fileid
+      - id: uploaded_file_version
+      - id: results
+
+  upload_testtest:
+    run: https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v3.1/cwl/upload_to_synapse.cwl
+    in:
+      - id: infile
+        source: "#run_docker/testtest"
       - id: parentid
         source: "#adminUploadSynId"
       - id: used_entity

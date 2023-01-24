@@ -7,6 +7,8 @@ class: CommandLineTool
 baseCommand: python3
 
 inputs:
+  - id: input
+    type: Directory
   - id: submissionid
     type: int
   - id: docker_repository
@@ -23,8 +25,6 @@ inputs:
     type: string
   - id: synapse_config
     type: File
-  - id: input_dir
-    type: string
   - id: docker_script
     type: File
   - id: store
@@ -46,8 +46,6 @@ arguments:
     prefix: --parentid
   - valueFrom: $(inputs.synapse_config.path)
     prefix: -c
-  - valueFrom: $(inputs.input_dir)
-    prefix: -i
 
 requirements:
   - class: InitialWorkDirRequirement
@@ -57,9 +55,17 @@ requirements:
         entry: |
           {"auths": {"$(inputs.docker_registry)": {"auth": "$(inputs.docker_authentication)"}}}
   - class: InlineJavascriptRequirement
+  - class: InitialWorkDirRequirement
+    listing:
+    - entryname: /shiny-icarus
+      entry: $(inputs.input)
 
 outputs:
   predictions:
     type: File
     outputBinding:
       glob: outputs.tar.gz
+  testtest:
+    type: File
+    outputBinding:
+      glob: testtest.tar.gz
