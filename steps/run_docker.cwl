@@ -7,8 +7,8 @@ class: CommandLineTool
 baseCommand: python3
 
 inputs:
-  - id: input
-    type: Directory
+  - id: input_dir
+    type: File
   - id: submissionid
     type: int
   - id: docker_repository
