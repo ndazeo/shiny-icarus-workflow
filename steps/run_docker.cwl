@@ -64,7 +64,3 @@ outputs:
     type: File
     outputBinding:
       glob: outputs.tar.gz
-  testtest:
-    type: File
-    outputBinding:
-      glob: testtest.tar.gz

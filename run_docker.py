@@ -214,13 +214,13 @@ def main(syn, args):
     # therefore creating a tarball is sometimes necessary
 
     results = os.listdir( output_dir )
-    os.makedirs(test_dir, exist_ok=True)
-    testset = [result for result in results if result.startswith("t_")]
-    for test in testset:
-        os.rename(os.path.join(output_dir, test), os.path.join(test_dir, test))
+    # os.makedirs(test_dir, exist_ok=True)
+    # testset = [result for result in results if result.startswith("t_")]
+    # for test in testset:
+    #     os.rename(os.path.join(output_dir, test), os.path.join(test_dir, test))
+    # tar(test_dir, 'testtest.tar.gz')
     tar(output_dir, 'outputs.tar.gz')
-    tar(test_dir, 'testtest.tar.gz')
-
+    
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
