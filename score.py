@@ -406,7 +406,7 @@ class Evaluator:
         # get functions for evaluation
         # somewhat convoluted, but allows users to define additonal metrics
         # on the fly, e.g. inside an IPython console
-        _funcs = {m: ALL_METRICS[m] for m in self.metrics + self.advanced_metrics}
+        _funcs = {m: ALL_METRICS[m] for m in self.metrics}
         frames = inspect.getouterframes(inspect.currentframe())
         for metric in self.metrics:
             for f in frames:
@@ -424,8 +424,6 @@ class Evaluator:
         self.result = OrderedDict()
 
         eval_metrics = self.metrics
-        if advanced:
-            eval_metrics += self.advanced_metrics
 
         if isinstance(self.labels, dict):
 
