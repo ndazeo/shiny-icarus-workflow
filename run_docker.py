@@ -146,6 +146,10 @@ def main(syn, args):
         volumes[vol] = {'bind': mounted_volumes[vol].split(":")[0],
                         'mode': mounted_volumes[vol].split(":")[1]}
 
+    device_requests = [
+        docker.types.DeviceRequest(capabilities=[['gpu']])
+    ]
+
     # Look for if the container exists already, if so, reconnect
     print("checking for containers")
     container = None
@@ -166,6 +170,7 @@ def main(syn, args):
                                               detach=True, volumes=volumes,
                                               name=args.submissionid,
                                               network_disabled=True,
+                                              device_requests=device_requests,
                                               mem_limit='6g', stderr=True)
         except docker.errors.APIError as err:
             remove_docker_container(args.submissionid)
