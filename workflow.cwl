@@ -2,7 +2,7 @@
 
 cwlVersion: v1.0
 class: Workflow
-label: shiny-icarus Evaluation
+label: shiny-icarus Test
 doc: >
   This workflow will run and evaluate Docker submissions to the
   shiny-icarus Challenge (syn123). Metrics returned are x, y, z.
@@ -177,8 +177,6 @@ steps:
         source: "#run_docker/predictions"
       - id: goldstandard
         source: "#download_goldstandard/filepath"
-      - id: check_validation_finished 
-        source: "#check_status/finished"
       - id: script
         default:
           class: File
