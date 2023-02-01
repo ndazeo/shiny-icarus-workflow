@@ -31,19 +31,6 @@ outputs: {}
 
 steps:
 
-  set_submitter_folder_permissions:
-    run: https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v3.1/cwl/set_permissions.cwl
-    in:
-      - id: entityid
-        source: "#submitterUploadSynId"
-      - id: principalid
-        valueFrom: "3461408"
-      - id: permissions
-        valueFrom: "download"
-      - id: synapse_config
-        source: "#synapseConfig"
-    out: []
-
   set_admin_folder_permissions:
     run: https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v3.1/cwl/set_permissions.cwl
     in:
@@ -86,7 +73,7 @@ steps:
     in:
       # Download raw files to run docker
       - id: synapseid
-        valueFrom: "syn50919873"
+        valueFrom: "syn50919862"
         # syn50919873 one train file
         # syn50919862 three train files
       - id: synapse_config
@@ -99,7 +86,7 @@ steps:
     in:
       # TODO: replace `valueFrom` with the Synapse ID to the challenge goldstandard
       - id: synapseid
-        valueFrom: "syn50919879"
+        valueFrom: "syn50919876"
         # syn50919876 three train get
         # syn50919879 one train gt
       - id: synapse_config
@@ -118,48 +105,6 @@ steps:
       - id: results
       - id: status
       - id: invalid_reasons
-
-  email_docker_validation:
-    run: https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v3.1/cwl/validate_email.cwl
-    in:
-      - id: submissionid
-        source: "#submissionId"
-      - id: synapse_config
-        source: "#synapseConfig"
-      - id: status
-        source: "#validate_docker/status"
-      - id: invalid_reasons
-        source: "#validate_docker/invalid_reasons"
-      # OPTIONAL: set `default` to `false` if email notification about valid submission is needed
-      - id: errors_only
-        default: true
-    out: [finished]
-
-  annotate_docker_validation_with_output:
-    run: https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v3.1/cwl/annotate_submission.cwl
-    in:
-      - id: submissionid
-        source: "#submissionId"
-      - id: annotation_values
-        source: "#validate_docker/results"
-      - id: to_public
-        default: true
-      - id: force
-        default: true
-      - id: synapse_config
-        source: "#synapseConfig"
-    out: [finished]
-
-  check_docker_status:
-    run: https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v3.1/cwl/check_status.cwl
-    in:
-      - id: status
-        source: "#validate_docker/status"
-      - id: previous_annotation_finished
-        source: "#annotate_docker_validation_with_output/finished"
-      - id: previous_email_finished
-        source: "#email_docker_validation/finished"
-    out: [finished]
 
   run_docker:
     run: steps/run_docker.cwl
@@ -182,7 +127,7 @@ steps:
         source: "#synapseConfig"
       # OPTIONAL: set `default` to `false` if log file should not be uploaded to Synapse
       - id: store
-        default: true
+        default: false
       - id: input_dir
         source: "#download_rawfiles/filepath"
       - id: docker_script
@@ -223,64 +168,6 @@ steps:
         default: true
       - id: synapse_config
         source: "#synapseConfig"
-      - id: previous_annotation_finished
-        source: "#annotate_docker_validation_with_output/finished"
-    out: [finished]
-
-  validate:
-    run: steps/validate.cwl
-    in:
-      - id: input_file
-        source: "#run_docker/predictions"
-      - id: entity_type
-        source: "#get_docker_submission/entity_type"
-    out:
-      - id: results
-      - id: status
-      - id: invalid_reasons
-  
-  email_validation:
-    run: https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v3.1/cwl/validate_email.cwl
-    in:
-      - id: submissionid
-        source: "#submissionId"
-      - id: synapse_config
-        source: "#synapseConfig"
-      - id: status
-        source: "#validate/status"
-      - id: invalid_reasons
-        source: "#validate/invalid_reasons"
-      # OPTIONAL: set `default` to `false` if email notification about valid submission is needed
-      - id: errors_only
-        default: true
-    out: [finished]
-
-  annotate_validation_with_output:
-    run: https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v3.1/cwl/annotate_submission.cwl
-    in:
-      - id: submissionid
-        source: "#submissionId"
-      - id: annotation_values
-        source: "#validate/results"
-      - id: to_public
-        default: true
-      - id: force
-        default: true
-      - id: synapse_config
-        source: "#synapseConfig"
-      - id: previous_annotation_finished
-        source: "#annotate_docker_upload_results/finished"
-    out: [finished]
-
-  check_status:
-    run: https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v3.1/cwl/check_status.cwl
-    in:
-      - id: status
-        source: "#validate/status"
-      - id: previous_annotation_finished
-        source: "#annotate_validation_with_output/finished"
-      - id: previous_email_finished
-        source: "#email_validation/finished"
     out: [finished]
 
   score:
@@ -298,20 +185,6 @@ steps:
           location: "score.py"
     out:
       - id: results
-      
-  email_score:
-    run: https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v3.1/cwl/score_email.cwl
-    in:
-      - id: submissionid
-        source: "#submissionId"
-      - id: synapse_config
-        source: "#synapseConfig"
-      - id: results
-        source: "#score/results"
-      # OPTIONAL: add annotations to be withheld from participants to `[]`
-      # - id: private_annotations
-      #   default: []
-    out: []
 
   annotate_submission_with_output:
     run: https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v3.1/cwl/annotate_submission.cwl
@@ -327,6 +200,6 @@ steps:
       - id: synapse_config
         source: "#synapseConfig"
       - id: previous_annotation_finished
-        source: "#annotate_validation_with_output/finished"
+        source: "#annotate_docker_upload_results/finished"
     out: [finished]
  

@@ -601,9 +601,7 @@ def aggregate_scores(test_ref_pairs,
             else:
                 all_scores["mean"][label][score] = float(np.mean(all_scores["mean"][label][score]))
 
-    return {"Dice": all_scores["mean"]["1"]["Dice"], "Re": all_scores["mean"]["1"]["Recall"], "Pr": all_scores["mean"]["1"]["Precision"],
-        "clDice": all_scores["mean"]["1"]["clDice"], "clRe": all_scores["mean"]["1"]["clRecall"], "clPr": all_scores["mean"]["1"]["clPrecision"], 
-        'submission_status': "SCORED"}
+    return {'all_scores': all_scores, 'submission_status': "SCORED"}
 
 def evaluate_folder(folder_with_gts: str, folder_with_predictions: str, labels: tuple = (1), **metric_kwargs):
     """
