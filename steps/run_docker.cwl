@@ -8,7 +8,8 @@ baseCommand: python3
 
 inputs:
   - id: input_dir
-    type: File
+    #type: File
+    type: string
   - id: submissionid
     type: int
   - id: docker_repository
@@ -46,14 +47,14 @@ arguments:
     prefix: --parentid
   - valueFrom: $(inputs.synapse_config.path)
     prefix: -c
-  - valueFrom: $(inputs.input_dir.path)
+  - valueFrom: $(inputs.input_dir)
     prefix: -i
 
 requirements:
   - class: InitialWorkDirRequirement
     listing:
       - $(inputs.docker_script)
-      - $(inputs.input_dir)
+      #- $(inputs.input_dir)
       - entryname: .docker/config.json
         entry: |
           {"auths": {"$(inputs.docker_registry)": {"auth": "$(inputs.docker_authentication)"}}}

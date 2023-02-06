@@ -68,18 +68,18 @@ steps:
       - id: docker_registry
       - id: docker_authentication
 
-  download_rawfiles:
-    run: https://raw.githubusercontent.com/Sage-Bionetworks-Workflows/cwl-tool-synapseclient/v1.4/cwl/synapse-get-tool.cwl
-    in:
-      # Download raw files to run docker
-      - id: synapseid
-        valueFrom: "syn50919862"
-        # syn50919873 one train file
-        # syn50919862 three train files
-      - id: synapse_config
-        source: "#synapseConfig"
-    out:
-      - id: filepath
+#  download_rawfiles:
+#    run: https://raw.githubusercontent.com/Sage-Bionetworks-Workflows/cwl-tool-synapseclient/v1.4/cwl/synapse-get-tool.cwl
+#    in:
+#      # Download raw files to run docker
+#      - id: synapseid
+#        valueFrom: "syn50919862"
+#        # syn50919873 one train file
+#        # syn50919862 three train files
+#      - id: synapse_config
+#        source: "#synapseConfig"
+#    out:
+#      - id: filepath
 
   download_goldstandard:
     run: https://raw.githubusercontent.com/Sage-Bionetworks-Workflows/cwl-tool-synapseclient/v1.4/cwl/synapse-get-tool.cwl
@@ -128,8 +128,10 @@ steps:
       # OPTIONAL: set `default` to `false` if log file should not be uploaded to Synapse
       - id: store
         default: false
+      # Reemplazar por carpeta local
       - id: input_dir
-        source: "#download_rawfiles/filepath"
+        #source: "#download_rawfiles/filepath"
+        valueFrom: "/media/camila/Datos4TB/challenge/trainraw/trainrawfiles.tar.gz"
       - id: docker_script
         default:
           class: File
