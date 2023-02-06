@@ -605,7 +605,7 @@ def aggregate_scores(test_ref_pairs,
         "clDice": all_scores["mean"]["1"]["clDice"], "clRe": all_scores["mean"]["1"]["clRecall"], "clPr": all_scores["mean"]["1"]["clPrecision"], 
         'submission_status': "SCORED"}
 
-def evaluate_folder(folder_with_gts: str, folder_with_predictions: str, labels: tuple = (1), **metric_kwargs):
+def evaluate_folder(folder_with_gts: str, folder_with_predictions: str, labels: tuple, **metric_kwargs):
     """
     writes a summary.json to folder_with_predictions
     :param folder_with_gts: folder where the ground truth segmentations are saved. Must be nifti files.
@@ -624,7 +624,7 @@ def evaluate_folder(folder_with_gts: str, folder_with_predictions: str, labels: 
     files_pred.sort()
     #assert all([i in files_pred for i in files_gt]), "files missing in folder_with_predictions"
     #assert all([i in files_gt for i in files_pred]), "files missing in folder_with_gts"
-    test_ref_pairs = [(os.path.join(folder_with_predictions, i), os.path.join(folder_with_gts, i)) for i in files_pred]
+    test_ref_pairs = [(os.path.join(folder_with_predictions, i), os.path.join(folder_with_gts, j)) for i,j in zip(files_pred, files_gt)]
     res = aggregate_scores(test_ref_pairs, json_output_file=os.path.join(folder_with_predictions, "summary.json"),
                             num_threads=1, labels=labels, **metric_kwargs)
     return res
@@ -658,7 +658,7 @@ def main():
     untar('pred', args.pred)
     print("pred", os.listdir('pred'))
     
-    result = evaluate_folder('ref', 'pred', args.l)
+    result = evaluate_folder('ref', 'pred', labels=(1,))
     print(result)
     with open(args.results, 'w') as o:
         o.write(json.dumps(result))
