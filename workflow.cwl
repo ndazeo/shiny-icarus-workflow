@@ -39,7 +39,7 @@ steps:
       - id: principalid
         valueFrom: "3461701"
       - id: permissions
-        valueFrom: "download"
+        valueFrom: "admin"
       - id: synapse_config
         source: "#synapseConfig"
     out: []
@@ -52,7 +52,7 @@ steps:
       - id: principalid
         valueFrom: "3461701"
       - id: permissions
-        valueFrom: "download"
+        valueFrom: "admin"
       - id: synapse_config
         source: "#synapseConfig"
     out: []
