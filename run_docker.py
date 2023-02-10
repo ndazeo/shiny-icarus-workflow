@@ -171,7 +171,7 @@ def main(syn, args):
                                               name=args.submissionid,
                                               network_disabled=True,
                                               device_requests=device_requests,
-                                              mem_limit='6g', stderr=True)
+                                              mem_limit='64g', stderr=True)
         except docker.errors.APIError as err:
             remove_docker_container(args.submissionid)
             errors = str(err) + "\n"
