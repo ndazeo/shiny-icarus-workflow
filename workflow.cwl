@@ -2,11 +2,10 @@
 
 cwlVersion: v1.0
 class: Workflow
-label: <YOUR CHALLENGE> Evaluation
+label: shiny-icarus Evaluation
 doc: >
-  BRIEF DESCRIPTION ABOUT THE CHALLENGE, e.g.
   This workflow will run and evaluate Docker submissions to the
-  Awesome Challenge (syn123). Metrics returned are x, y, z.
+  shiny-icarus Challenge (syn123). Metrics returned are x, y, z.
 
 requirements:
   - class: StepInputExpressionRequirement
@@ -37,9 +36,8 @@ steps:
     in:
       - id: entityid
         source: "#submitterUploadSynId"
-      # TODO: replace `valueFrom` with the admin user ID or admin team ID
       - id: principalid
-        valueFrom: "3379097"
+        valueFrom: "3461408"
       - id: permissions
         valueFrom: "download"
       - id: synapse_config
@@ -51,9 +49,8 @@ steps:
     in:
       - id: entityid
         source: "#adminUploadSynId"
-      # TODO: replace `valueFrom` with the admin user ID or admin team ID
       - id: principalid
-        valueFrom: "3379097"
+        valueFrom: "3461408"
       - id: permissions
         valueFrom: "download"
       - id: synapse_config
@@ -84,12 +81,27 @@ steps:
       - id: docker_registry
       - id: docker_authentication
 
+#  download_rawfiles:
+#    run: https://raw.githubusercontent.com/Sage-Bionetworks-Workflows/cwl-tool-synapseclient/v1.4/cwl/synapse-get-tool.cwl
+#    in:
+#      # Download raw files to run docker
+#      - id: synapseid
+#        valueFrom: "syn50919873"
+#        # syn50919873 one train file
+#        # syn50919862 three train files
+#      - id: synapse_config
+#        source: "#synapseConfig"
+#    out:
+#      - id: filepath
+
   download_goldstandard:
     run: https://raw.githubusercontent.com/Sage-Bionetworks-Workflows/cwl-tool-synapseclient/v1.4/cwl/synapse-get-tool.cwl
     in:
       # TODO: replace `valueFrom` with the Synapse ID to the challenge goldstandard
       - id: synapseid
-        valueFrom: "syn18081597"
+        valueFrom: "syn50919879"
+        # syn50919876 three train get
+        # syn50919879 one train gt
       - id: synapse_config
         source: "#synapseConfig"
     out:
@@ -171,9 +183,10 @@ steps:
       # OPTIONAL: set `default` to `false` if log file should not be uploaded to Synapse
       - id: store
         default: true
-      # TODO: replace `valueFrom` with the absolute path to the data directory to be mounted
+      # Reemplazar por carpeta local y el tar.gz con un caso de train
       - id: input_dir
-        valueFrom: "/tmp"
+        valueFrom: "/media/camila/Datos4TB/challenge/trainraw/trainrawfile.tar.gz"
+        #source: "#download_rawfiles/filepath"
       - id: docker_script
         default:
           class: File
@@ -275,12 +288,16 @@ steps:
   score:
     run: steps/score.cwl
     in:
-      - id: input_file
+      - id: input
         source: "#run_docker/predictions"
       - id: goldstandard
         source: "#download_goldstandard/filepath"
       - id: check_validation_finished 
         source: "#check_status/finished"
+      - id: script
+        default:
+          class: File
+          location: "score.py"
     out:
       - id: results
       

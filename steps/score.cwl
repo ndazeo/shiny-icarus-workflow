@@ -8,27 +8,14 @@ requirements:
   - class: InlineJavascriptRequirement
   - class: InitialWorkDirRequirement
     listing:
-    - entryname: score.py
-      entry: |
-        #!/usr/bin/env python
-        import argparse
-        import json
-        parser = argparse.ArgumentParser()
-        parser.add_argument("-f", "--submissionfile", required=True, help="Submission File")
-        parser.add_argument("-r", "--results", required=True, help="Scoring results")
-        parser.add_argument("-g", "--goldstandard", required=True, help="Goldstandard for scoring")
+    - $(inputs.script)
+        
 
-        args = parser.parse_args()
-        score = 1 + 1
-        prediction_file_status = "SCORED"
-
-        result = {'auc': score,
-                  'submission_status': prediction_file_status}
-        with open(args.results, 'w') as o:
-          o.write(json.dumps(result))
 
 inputs:
-  - id: input_file
+  - id: script
+    type: File
+  - id: input
     type: File
   - id: goldstandard
     type: File
@@ -50,13 +37,13 @@ outputs:
 baseCommand: python
 arguments:
   - valueFrom: score.py
-  - prefix: -f
-    valueFrom: $(inputs.input_file.path)
-  - prefix: -g
+  - prefix: -ref
     valueFrom: $(inputs.goldstandard.path)
+  - prefix: -pred
+    valueFrom: $(inputs.input.path)
   - prefix: -r
     valueFrom: results.json
 
 hints:
   DockerRequirement:
-    dockerPull: python:3.9.1-slim-buster
+    dockerPull: ndazeo/shiny-icarus-evaluation

@@ -3,6 +3,7 @@ from __future__ import print_function
 import argparse
 import getpass
 import os
+import random
 import tarfile
 import time
 
@@ -85,7 +86,7 @@ def tar(directory, tar_filename):
         tar_filename:  tar file path
     """
     with tarfile.open(tar_filename, "w") as tar_o:
-        tar_o.add(directory)
+        tar_o.add(directory, arcname='')
     # TODO: Potentially add code to remove all files that were zipped.
 
 
@@ -124,9 +125,12 @@ def main(syn, args):
     docker_image = args.docker_repository + "@" + args.docker_digest
 
     # These are the volumes that you want to mount onto your docker container
-    #output_dir = os.path.join(os.getcwd(), "output")
-    output_dir = os.getcwd()
-    input_dir = args.input_dir
+    output_dir = os.path.join(os.getcwd(), "output")
+    #test_dir = os.path.join(os.getcwd(), "test")
+    #output_dir = os.getcwd()
+    #input_dir = args.input_dir
+    untar('input_dir', args.input_dir)
+    input_dir = os.path.join(os.getcwd(), "input_dir")
 
     print("mounting volumes")
     # These are the locations on the docker that you want your mounted
@@ -141,6 +145,10 @@ def main(syn, args):
     for vol in all_volumes:
         volumes[vol] = {'bind': mounted_volumes[vol].split(":")[0],
                         'mode': mounted_volumes[vol].split(":")[1]}
+
+    device_requests = [
+        docker.types.DeviceRequest(capabilities=[['gpu']])
+    ]
 
     # Look for if the container exists already, if so, reconnect
     print("checking for containers")
@@ -162,7 +170,8 @@ def main(syn, args):
                                               detach=True, volumes=volumes,
                                               name=args.submissionid,
                                               network_disabled=True,
-                                              mem_limit='6g', stderr=True)
+                                              device_requests=device_requests,
+                                              mem_limit='64g', stderr=True)
         except docker.errors.APIError as err:
             remove_docker_container(args.submissionid)
             errors = str(err) + "\n"
@@ -201,15 +210,22 @@ def main(syn, args):
 
     output_folder = os.listdir(output_dir)
     if not output_folder:
-        raise Exception("No 'predictions.csv' file written to /output, "
+        raise Exception("No file written to /output, "
                         "please check inference docker")
-    elif "predictions.csv" not in output_folder:
-        raise Exception("No 'predictions.csv' file written to /output, "
-                        "please check inference docker")
+    #elif "predictions.csv" not in output_folder:
+    #    raise Exception("No 'predictions.csv' file written to /output, "
+    #                    "please check inference docker")
     # CWL has a limit of the array of files it can accept in a folder
     # therefore creating a tarball is sometimes necessary
-    # tar(output_dir, 'outputs.tar.gz')
 
+    results = os.listdir( output_dir )
+    # os.makedirs(test_dir, exist_ok=True)
+    # testset = [result for result in results if result.startswith("t_")]
+    # for test in testset:
+    #     os.rename(os.path.join(output_dir, test), os.path.join(test_dir, test))
+    # tar(test_dir, 'testtest.tar.gz')
+    tar(output_dir, 'outputs.tar.gz')
+    
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -219,7 +235,7 @@ if __name__ == '__main__':
                         help="Docker Repository")
     parser.add_argument("-d", "--docker_digest", required=True,
                         help="Docker Digest")
-    parser.add_argument("-i", "--input_dir", required=True,
+    parser.add_argument("-i", "--input_dir", required=False,
                         help="Input Directory")
     parser.add_argument("-c", "--synapse_config", required=True,
                         help="credentials file")
