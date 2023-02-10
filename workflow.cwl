@@ -37,7 +37,7 @@ steps:
       - id: entityid
         source: "#submitterUploadSynId"
       - id: principalid
-        valueFrom: "3461408"
+        valueFrom: "3461701"
       - id: permissions
         valueFrom: "download"
       - id: synapse_config
@@ -50,7 +50,7 @@ steps:
       - id: entityid
         source: "#adminUploadSynId"
       - id: principalid
-        valueFrom: "3461408"
+        valueFrom: "3461701"
       - id: permissions
         valueFrom: "download"
       - id: synapse_config
@@ -97,7 +97,6 @@ steps:
   download_goldstandard:
     run: https://raw.githubusercontent.com/Sage-Bionetworks-Workflows/cwl-tool-synapseclient/v1.4/cwl/synapse-get-tool.cwl
     in:
-      # TODO: replace `valueFrom` with the Synapse ID to the challenge goldstandard
       - id: synapseid
         valueFrom: "syn50919879"
         # syn50919876 three train get
@@ -185,7 +184,7 @@ steps:
         default: true
       # Reemplazar por carpeta local y el tar.gz con un caso de train
       - id: input_dir
-        valueFrom: "/media/camila/Datos4TB/challenge/trainraw/trainrawfile.tar.gz"
+        valueFrom: "/trainrawfile.tar.gz"
         #source: "#download_rawfiles/filepath"
       - id: docker_script
         default:
