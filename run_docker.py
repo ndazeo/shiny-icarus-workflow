@@ -149,6 +149,10 @@ def main(syn, args):
     device_requests = [
         docker.types.DeviceRequest(capabilities=[['gpu']])
     ]
+    ulimits = [
+        docker.types.Ulimit(name='memlock', soft=-1),
+        docker.types.Ulimit(name='stack', soft=67108864)
+    ]
 
     # Look for if the container exists already, if so, reconnect
     print("checking for containers")
@@ -171,7 +175,8 @@ def main(syn, args):
                                               name=args.submissionid,
                                               network_disabled=True,
                                               device_requests=device_requests,
-                                              mem_limit='64g', stderr=True)
+                                              mem_limit='64g', 
+                                              shm_size='1g', stderr=True)
         except docker.errors.APIError as err:
             remove_docker_container(args.submissionid)
             errors = str(err) + "\n"
