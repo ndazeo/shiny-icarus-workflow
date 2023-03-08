@@ -177,7 +177,7 @@ def main(syn, args):
                                               device_requests=device_requests,
                                               mem_limit='64g', 
                                               shm_size='1g', 
-                                              ulimits=ulimits,
+                                              #ulimits=ulimits,
                                               stderr=True)
         except docker.errors.APIError as err:
             remove_docker_container(args.submissionid)
