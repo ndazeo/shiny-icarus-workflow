@@ -182,6 +182,7 @@ def main(syn, args):
         except docker.errors.APIError as err:
             remove_docker_container(args.submissionid)
             errors = str(err) + "\n"
+            print(errors)
 
     print("creating logfile")
     # Create the logfile
