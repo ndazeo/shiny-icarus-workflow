@@ -23,9 +23,6 @@ inputs:
   goldstandard:
     label: tar.gz with goldstandard
     type File
-  workflowSynapseId:
-    label: Synapse File ID that links to the workflow
-    type: string
 
 outputs: {}
 
