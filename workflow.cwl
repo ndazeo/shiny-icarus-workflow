@@ -22,12 +22,11 @@ inputs:
     type: File
   goldstandard:
     label: tar.gz with goldstandard
-    type File
+    type: File
 
 outputs: {}
 
 steps:
-
   get_docker_submission:
     run: https://raw.githubusercontent.com/Sage-Bionetworks/ChallengeWorkflowTemplates/v3.1/cwl/get_submission.cwl
     in:
@@ -95,9 +94,10 @@ steps:
     in:
       - id: submissionid
         source: "#submissionId"
-      - id: annotation_values
+      - id: results
         source: "#score/results"
       - id: script
         default:
           class: File
           location: "scripts/print_results.py"
+    out: []

@@ -16,7 +16,9 @@ inputs:
 
 arguments: 
   - valueFrom: $(inputs.script.path)
-  - valueFrom: $(inputs.results)
+  - valueFrom: $(inputs.results.path)
     prefix: -f
   - valueFrom: $(inputs.submissionid)
     prefix: -s
+
+outputs: []
