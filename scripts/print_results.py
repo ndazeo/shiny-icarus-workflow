@@ -7,7 +7,7 @@ def main(args):
     print(args.submissionid)
     with open(args.file, 'r') as f:
         results = json.load(f)
-        for v in result:
+        for v in results:
             print(v)
 
 if __name__ == "__main__":
