@@ -42,7 +42,7 @@ def get_last_lines(log_filename, n=5):
     return last_lines
 
 
-def store_log_file(syn, log_filename, parentid, store=True):
+def store_log_file(syn, log_filename):
     """Store log file"""
     statinfo = os.stat(log_filename)
     if statinfo.st_size > 0:
@@ -50,12 +50,6 @@ def store_log_file(syn, log_filename, parentid, store=True):
         if statinfo.st_size/1000.0 > 50:
             log_tail = get_last_lines(log_filename)
             create_log_file(log_filename, log_tail)
-        ent = synapseclient.File(log_filename, parent=parentid)
-        if store:
-            try:
-                syn.store(ent)
-            except synapseclient.exceptions.SynapseHTTPError as err:
-                print(err)
 
 
 def remove_docker_container(container_name):
@@ -197,12 +191,12 @@ def main(syn, args):
         while container in client.containers.list(ignore_removed=True):
             log_text = container.logs()
             create_log_file(log_filename, log_text=log_text)
-            store_log_file(syn, log_filename, args.parentid, store=args.store)
+            store_log_file(syn, log_filename)
             time.sleep(60)
         # Must run again to make sure all the logs are captured
         log_text = container.logs()
         create_log_file(log_filename, log_text=log_text)
-        store_log_file(syn, log_filename, args.parentid, store=args.store)
+        store_log_file(syn, log_filename)
         # Remove container and image after being done
         container.remove()
 
@@ -210,7 +204,7 @@ def main(syn, args):
 
     if statinfo.st_size == 0:
         create_log_file(log_filename, log_text=errors)
-        store_log_file(syn, log_filename, args.parentid, store=args.store)
+        store_log_file(syn, log_filename)
 
     print("finished training")
     # Try to remove the image
@@ -249,9 +243,6 @@ if __name__ == '__main__':
                         help="credentials file")
     parser.add_argument("--store", action='store_true',
                         help="to store logs")
-    parser.add_argument("--parentid", required=True,
-                        help="Parent Id of submitter directory")
-    parser.add_argument("--status", required=True, help="Docker image status")
     args = parser.parse_args()
     syn = synapseclient.Synapse(configPath=args.synapse_config)
     syn.login()
