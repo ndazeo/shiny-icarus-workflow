@@ -4,11 +4,11 @@ import argparse
 import json
 
 def main(args):
-    print(args.submissionid)
+    print("submissionid ", args.submissionid)
     with open(args.file, 'r') as f:
         results = json.load(f)
-        for v in results:
-            print(v)
+        for k in results:
+            print(k, results[k])
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
