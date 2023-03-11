@@ -177,6 +177,7 @@ def main(syn, args):
             print(errors)
 
     print("creating logfile")
+    print(log_text)
     # Create the logfile
     log_filename = args.submissionid + "_log.txt"
     # Open log file first
