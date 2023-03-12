@@ -177,7 +177,6 @@ def main(syn, args):
             print(errors)
 
     print("creating logfile")
-    print(log_text)
     # Create the logfile
     log_filename = args.submissionid + "_log.txt"
     # Open log file first
@@ -189,6 +188,7 @@ def main(syn, args):
         # Check if container is still running
         while container in client.containers.list(ignore_removed=True):
             log_text = container.logs()
+            print(log_text)
             create_log_file(log_filename, log_text=log_text)
             store_log_file(log_filename)
             time.sleep(60)
