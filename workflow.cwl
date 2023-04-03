@@ -88,7 +88,7 @@ steps:
           location: "scripts/score.py"
     out:
       - id: results
-    
+
   print_results:
     run: steps/print_results.cwl
     in:
@@ -101,3 +101,9 @@ steps:
           class: File
           location: "scripts/print_results.py"
     out: []
+
+outputs:
+  scores:
+    source: "#score/results"
+  predictions:
+    source: "#run_docker/predictions"
